@@ -1,0 +1,132 @@
+Traceback (most recent call last):
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\engine\default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.InsufficientPrivilege: permission denied for schema public
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\test_load.py", line 4, in <module>
+    import main
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\main.py", line 13, in <module>
+    Base.metadata.create_all(bind=engine)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\sql\schema.py", line 5931, in create_all
+    bind._run_ddl_visitor(
+    ~~~~~~~~~~~~~~~~~~~~~^
+        ddl.SchemaGenerator, self, checkfirst=checkfirst, tables=tables
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 3268, in _run_ddl_visitor
+    conn._run_ddl_visitor(visitorcallable, element, **kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 2467, in _run_ddl_visitor
+    ).traverse_single(element)
+      ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\sql\visitors.py", line 661, in traverse_single
+    return meth(obj, **kw)
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\sql\ddl.py", line 974, in visit_metadata
+    with self.with_ddl_events(
+         ~~~~~~~~~~~~~~~~~~~~^
+        metadata,
+        ^^^^^^^^^
+        tables=event_collection,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+        checkfirst=self.checkfirst,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "C:\Users\Sabeel\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\sql\ddl.py", line 888, in with_ddl_events
+    target.dispatch.before_create(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        target, self.connection, _ddl_runner=self, **kw
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\event\attr.py", line 515, in __call__
+    fn(*args, **kw)
+    ~~^^^^^^^^^^^^^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 834, in __call__
+    return getattr(self.target, self.name)(*arg, **kw)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\sql\sqltypes.py", line 1172, in _on_metadata_create
+    t._on_metadata_create(target, bind, **kw)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\named_types.py", line 137, in _on_metadata_create
+    self.create(bind=bind, checkfirst=checkfirst)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\named_types.py", line 369, in create
+    super().create(bind, checkfirst=checkfirst)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\named_types.py", line 56, in create
+    bind._run_ddl_visitor(self.DDLGenerator, self, checkfirst=checkfirst)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 2467, in _run_ddl_visitor
+    ).traverse_single(element)
+      ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\sql\visitors.py", line 661, in traverse_single
+    return meth(obj, **kw)
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\named_types.py", line 186, in visit_enum
+    self.connection.execute(CreateEnumType(enum))
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\sql\ddl.py", line 187, in _execute_on_connection
+    return connection._execute_ddl(
+           ~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1530, in _execute_ddl
+    ret = self._execute_context(
+        dialect,
+    ...<4 lines>...
+        compiled,
+    )
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Sabeel\Desktop\myprojects\business_pro\backend\venv\Lib\site-packages\sqlalchemy\engine\default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.InsufficientPrivilege) permission denied for schema public
+
+[SQL: CREATE TYPE userrole AS ENUM ('Admin', 'Sales_Manager', 'Sales_Executive', 'HR_Executive', 'Employee')]
+(Background on this error at: https://sqlalche.me/e/20/f405)
