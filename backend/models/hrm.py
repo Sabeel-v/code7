@@ -24,6 +24,7 @@ class LeaveRequest(Base, AuditMixin):
 
     id = Column(Integer, primary_key=True, index=True)
     employee_id = Column(Integer, ForeignKey("employees.id"), nullable=False)
+    leave_type = Column(String, default="Sick Leave", server_default="Sick Leave", nullable=False)
     start_date = Column(__import__('sqlalchemy').Date, nullable=False)
     end_date = Column(__import__('sqlalchemy').Date, nullable=False)
     reason = Column(String, nullable=False)

@@ -9,9 +9,34 @@ from models.hrm import Employee
 from schemas.user import UserCreate, UserResponse, Token
 from core.security import get_password_hash, verify_password, create_access_token
 from core.config import settings
-from api.dependencies import get_current_user
+from api.dependencies import get_current_user, require_roles
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
+
+@router.post("/create-user", response_model=UserResponse)
+def create_staff(user_in: UserCreate, db: Session = Depends(get_db), current_user: User = Depends(require_roles([UserRole.Admin]))):
+    user = db.query(User).filter(User.email == user_in.email).first()
+    if user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    hashed_password = get_password_hash(user_in.password)
+    try:
+        role_enum = UserRole(user_in.role)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Invalid role")
+
+    new_user = User(
+        email=user_in.email,
+        full_name=user_in.full_name,
+        hashed_password=hashed_password,
+        role=role_enum
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
 
 @router.post("/register", response_model=UserResponse)
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
@@ -58,6 +83,12 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+from typing import List
+
 @router.get("/me", response_model=UserResponse)
 def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
+
+@router.get("/users", response_model=List[UserResponse])
+def get_all_users(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return db.query(User).all()

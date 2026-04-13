@@ -8,6 +8,8 @@ from models import user, crm, hrm # import these so Base knows about them before
 from api.auth import router as auth_router
 from api.leads import router as leads_router
 from api.hrm import router as hrm_router
+from api.dashboard import router as dashboard_router
+from api.crm import router as crm_router
 
 # Create tables (for production, use Alembic migrations instead)
 Base.metadata.create_all(bind=engine)
@@ -30,6 +32,8 @@ app.add_middleware(
 app.include_router(auth_router, prefix="/api")
 app.include_router(leads_router, prefix="/api")
 app.include_router(hrm_router, prefix="/api")
+app.include_router(dashboard_router, prefix="/api")
+app.include_router(crm_router, prefix="/api")
 
 @app.get("/")
 def root():

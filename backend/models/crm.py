@@ -19,6 +19,7 @@ class Lead(Base, AuditMixin):
     email = Column(String, nullable=True)
     phone = Column(String, nullable=True)
     company = Column(String, nullable=True)
+    source = Column(String, default="Website", server_default="Website", nullable=False)
     status = Column(Enum(LeadStatus), default=LeadStatus.New, nullable=False)
     
     # Manager or Admin assigns default None -> assigned_to User (Sales Exec)

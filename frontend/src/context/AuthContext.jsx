@@ -48,7 +48,11 @@ export const AuthProvider = ({ children }) => {
       setUser(meResponse.data);
       return true;
     } catch (err) {
-      setError(err.response?.data?.detail || "Login failed");
+      let errorMsg = "Login failed";
+      if (err.response?.data?.detail) {
+        errorMsg = Array.isArray(err.response.data.detail) ? err.response.data.detail[0].msg : err.response.data.detail;
+      }
+      setError(errorMsg);
       return false;
     }
   };
@@ -60,7 +64,11 @@ export const AuthProvider = ({ children }) => {
       // Auto login after register
       return await login(userData.email, userData.password);
     } catch (err) {
-      setError(err.response?.data?.detail || "Registration failed");
+      let errorMsg = "Registration failed";
+      if (err.response?.data?.detail) {
+        errorMsg = Array.isArray(err.response.data.detail) ? err.response.data.detail[0].msg : err.response.data.detail;
+      }
+      setError(errorMsg);
       return false;
     }
   };

@@ -19,7 +19,16 @@ class EmployeeResponse(EmployeeBase):
     class Config:
         orm_mode = True
 
+class EmployeeProfileResponse(BaseModel):
+    id: int
+    department: Optional[str]
+    designation: Optional[str]
+    joining_date: datetime
+    full_name: str
+    email: str
+
 class LeaveRequestBase(BaseModel):
+    leave_type: str = "Sick Leave"
     start_date: date
     end_date: date
     reason: str

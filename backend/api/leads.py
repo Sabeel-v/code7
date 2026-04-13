@@ -20,8 +20,8 @@ def create_lead(lead: LeadCreate, db: Session = Depends(get_db), current_user: U
 
 @router.get("/", response_model=List[LeadResponse])
 def get_leads(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    # Simple role-based filter could be implemented here
-    # For now, return all leads
+    if current_user.role == UserRole.Sales_Executive:
+        return db.query(Lead).filter(Lead.assigned_to == current_user.id).all()
     return db.query(Lead).all()
 
 @router.get("/{lead_id}", response_model=LeadResponse)
@@ -29,6 +29,10 @@ def get_lead(lead_id: int, db: Session = Depends(get_db), current_user: User = D
     lead = db.query(Lead).filter(Lead.id == lead_id).first()
     if lead is None:
         raise HTTPException(status_code=404, detail="Lead not found")
+        
+    if current_user.role == UserRole.Sales_Executive and lead.assigned_to != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to view this lead")
+        
     return lead
 
 @router.put("/{lead_id}", response_model=LeadResponse)
@@ -36,6 +40,9 @@ def update_lead(lead_id: int, lead_in: LeadUpdate, db: Session = Depends(get_db)
     db_lead = db.query(Lead).filter(Lead.id == lead_id).first()
     if db_lead is None:
         raise HTTPException(status_code=404, detail="Lead not found")
+        
+    if current_user.role == UserRole.Sales_Executive and db_lead.assigned_to != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this lead")
         
     for var, value in vars(lead_in).items():
         if value is not None:
@@ -64,6 +71,9 @@ def convert_lead(lead_id: int, db: Session = Depends(get_db), current_user: User
     db_lead = db.query(Lead).filter(Lead.id == lead_id).first()
     if db_lead is None:
         raise HTTPException(status_code=404, detail="Lead not found")
+        
+    if current_user.role == UserRole.Sales_Executive and db_lead.assigned_to != current_user.id:
+        raise HTTPException(status_code=403, detail="You can only convert leads explicitly assigned to you")
     
     if db_lead.status == LeadStatus.Converted:
         raise HTTPException(status_code=400, detail="Lead already converted")

@@ -5,16 +5,54 @@ from typing import List
 from database import get_db
 from models.user import User, UserRole
 from models.hrm import Employee, LeaveRequest, LeaveStatus
-from schemas.hrm import LeaveRequestCreate, LeaveRequestResponse
+from schemas.hrm import LeaveRequestCreate, LeaveRequestResponse, EmployeeProfileResponse
 from api.dependencies import get_current_user, require_roles
 
 router = APIRouter(prefix="/hrm", tags=["HRM"])
+
+@router.get("/my-profile", response_model=EmployeeProfileResponse)
+def get_my_profile(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    employee = db.query(Employee).filter(Employee.user_id == current_user.id).first()
+    if not employee:
+        employee = Employee(user_id=current_user.id, department="Unassigned", designation="Employee")
+        db.add(employee)
+        db.commit()
+        db.refresh(employee)
+    
+    return {
+        "id": employee.id,
+        "department": employee.department,
+        "designation": employee.designation,
+        "joining_date": current_user.created_at,
+        "full_name": current_user.full_name,
+        "email": current_user.email
+    }
+
+
+@router.get("/employees", response_model=List[EmployeeProfileResponse])
+def get_employees(db: Session = Depends(get_db), current_user: User = Depends(require_roles([UserRole.Admin, UserRole.HR_Executive]))):
+    employees = db.query(Employee).all()
+    result = []
+    for emp in employees:
+        result.append({
+            "id": emp.id,
+            "department": emp.department,
+            "designation": emp.designation,
+            "joining_date": emp.user.created_at,
+            "full_name": emp.user.full_name,
+            "email": emp.user.email
+        })
+    return result
+
 
 @router.post("/leave-requests", response_model=LeaveRequestResponse)
 def create_leave_request(leave_in: LeaveRequestCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     employee = db.query(Employee).filter(Employee.user_id == current_user.id).first()
     if not employee:
-        raise HTTPException(status_code=400, detail="Employee profile not found")
+        employee = Employee(user_id=current_user.id, department="Unassigned", designation="Employee")
+        db.add(employee)
+        db.commit()
+        db.refresh(employee)
         
     db_leave = LeaveRequest(
         **leave_in.dict(),

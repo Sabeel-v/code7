@@ -9,6 +9,7 @@ class LeadBase(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     company: Optional[str] = None
+    source: Optional[str] = "Website"
 
 class LeadCreate(LeadBase):
     pass

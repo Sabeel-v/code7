@@ -1,131 +1,156 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, CheckCircle, XCircle, Plus } from 'lucide-react';
+import { Calendar, CheckCircle, XCircle, Users, UserCircle, UserPlus } from 'lucide-react';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 
 const HRM = () => {
   const { user, hasRole } = useAuth();
+  const [activeTab, setActiveTab] = useState('leaves'); 
   const [leaves, setLeaves] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    leave_type: 'Sick Leave',
-    start_date: '',
-    end_date: '',
-    reason: ''
-  });
+  
+  // Admin Staff Creation State
+  const [showStaffForm, setShowStaffForm] = useState(false);
+  const [staffFormData, setStaffFormData] = useState({ full_name: '', email: '', password: '', role: 'Employee' });
 
-  const fetchLeaves = async () => {
+  const fetchData = async () => {
+    setLoading(true);
     try {
-      const res = await api.get('/hrm/leave-requests');
-      setLeaves(res.data);
+      if (activeTab === 'leaves') {
+        const res = await api.get('/hrm/leave-requests');
+        setLeaves(res.data);
+      } else {
+        const res = await api.get('/hrm/employees');
+        setEmployees(res.data);
+      }
     } catch (err) {
-      console.error("Failed to fetch leaves", err);
+      console.error("Failed to fetch HRM data", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchLeaves();
-  }, []);
+    fetchData();
+  }, [activeTab]);
 
   const handleAction = async (id, newStatus) => {
     try {
       await api.post(`/hrm/leave-requests/${id}/approve?status=${newStatus}`);
-      fetchLeaves();
+      fetchData();
     } catch (err) {
       console.error("Failed to update status", err);
       alert(err.response?.data?.detail || "Error updating leave status");
     }
   };
-
-  const handleCreate = async (e) => {
+  
+  const handleCreateStaff = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/hrm/leave-requests', formData);
-      setShowForm(false);
-      setFormData({ leave_type: 'Sick Leave', start_date: '', end_date: '', reason: '' });
-      fetchLeaves();
+      await api.post('/auth/create-user', staffFormData);
+      setShowStaffForm(false);
+      setStaffFormData({ full_name: '', email: '', password: '', role: 'Employee' });
+      fetchData();
     } catch (err) {
-      console.error("Failed to create request", err);
-      alert(err.response?.data?.detail || "Error creating leave request");
+      let errorMsg = "Failed to create staff";
+      if (err.response?.data?.detail) {
+        errorMsg = Array.isArray(err.response.data.detail) ? err.response.data.detail[0].msg : err.response.data.detail;
+      }
+      alert(errorMsg);
     }
   };
 
-  // Only HR/Admin can approve.
-  const canApprove = hasRole(['Admin', 'HR_Executive']);
+  const canApprove = hasRole(['Admin', 'HR Executive']);
+  const isAdmin = user?.role === 'Admin';
 
   return (
     <div className="space-y-6 animate-slide-up">
-      <div className="flex justify-between items-end mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">HRM Dashboard</h1>
-          <p className="text-slate-500 dark:text-slate-400">Manage employee leave requests.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">HRM Administration</h1>
+          <p className="text-slate-500 dark:text-slate-400">Manage company employees and leave workflows.</p>
         </div>
-        <button 
-          onClick={() => setShowForm(!showForm)}
-          className="flex items-center px-4 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-medium shadow-sm active:scale-95"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Request Leave
-        </button>
+        
+        <div className="flex items-center space-x-4">
+          <div className="flex space-x-2 bg-slate-200 dark:bg-slate-800 p-1 rounded-xl">
+            <button 
+              onClick={() => { setActiveTab('leaves'); setShowStaffForm(false); }} 
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${activeTab === 'leaves' ? 'bg-white dark:bg-slate-700 text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'}`}
+            >
+              Leave Requests
+            </button>
+            <button 
+              onClick={() => setActiveTab('employees')} 
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${activeTab === 'employees' ? 'bg-white dark:bg-slate-700 text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'}`}
+            >
+              Employee List
+            </button>
+          </div>
+          
+          {isAdmin && activeTab === 'employees' && (
+             <button 
+               onClick={() => setShowStaffForm(!showStaffForm)} 
+               className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition font-medium shadow-sm active:scale-95 text-sm"
+             >
+                <UserPlus className="w-4 h-4 mr-2" />
+                New Staff
+             </button>
+          )}
+        </div>
       </div>
-
-      {showForm && (
+      
+      {/* Admin Creation Form */}
+      {showStaffForm && activeTab === 'employees' && isAdmin && (
         <div className="glass rounded-2xl p-6 mb-8 animate-fade-in border-t-4 border-t-primary-500">
-          <h2 className="text-lg font-bold mb-4">Request New Leave</h2>
-          <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Leave Type</label>
-              <select required value={formData.leave_type} onChange={e => setFormData({...formData, leave_type: e.target.value})} className="w-full bg-white/50 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 p-2.5 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none">
-                <option>Sick Leave</option>
-                <option>Vacation</option>
-                <option>Personal</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Reason (Optional)</label>
-              <input value={formData.reason} onChange={e => setFormData({...formData, reason: e.target.value})} type="text" className="w-full bg-white/50 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 p-2.5 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none" placeholder="Brief reason" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Start Date</label>
-              <input required value={formData.start_date} onChange={e => setFormData({...formData, start_date: e.target.value})} type="date" className="w-full bg-white/50 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 p-2.5 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">End Date</label>
-              <input required value={formData.end_date} onChange={e => setFormData({...formData, end_date: e.target.value})} type="date" className="w-full bg-white/50 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 p-2.5 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none" />
-            </div>
-            
-            <div className="flex items-end space-x-2 md:col-span-2">
-              <button type="submit" className="flex-1 bg-primary-600 text-white p-2.5 rounded-lg font-medium hover:bg-primary-700">
-                Submit Request
-              </button>
-              <button type="button" onClick={() => setShowForm(false)} className="px-4 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 p-2.5 rounded-lg font-medium hover:bg-slate-300 dark:hover:bg-slate-600">
-                Cancel
-              </button>
-            </div>
-          </form>
+           <form onSubmit={handleCreateStaff} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
+                <input required value={staffFormData.full_name} onChange={e=>setStaffFormData({...staffFormData, full_name: e.target.value})} className="w-full bg-white/50 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 p-2.5 rounded-lg text-sm" placeholder="John Doe" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
+                <input required type="email" value={staffFormData.email} onChange={e=>setStaffFormData({...staffFormData, email: e.target.value})} className="w-full bg-white/50 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 p-2.5 rounded-lg text-sm" placeholder="staff@example.com" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Password</label>
+                <input required type="password" value={staffFormData.password} onChange={e=>setStaffFormData({...staffFormData, password: e.target.value})} className="w-full bg-white/50 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 p-2.5 rounded-lg text-sm" placeholder="••••••••" />
+              </div>
+              <div>
+                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Role Allocation</label>
+                 <select value={staffFormData.role} onChange={e=>setStaffFormData({...staffFormData, role: e.target.value})} className="w-full bg-white/50 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 p-2.5 rounded-lg text-sm text-slate-800 dark:text-white">
+                   {['Admin', 'Sales Manager', 'Sales Executive', 'HR Executive', 'Employee'].map(r => (
+                     <option key={r} value={r}>{r}</option>
+                   ))}
+                 </select>
+              </div>
+              <div className="lg:col-span-4 flex justify-end space-x-2 mt-2">
+                 <button type="button" onClick={() => setShowStaffForm(false)} className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-300 transition-colors">Cancel</button>
+                 <button type="submit" className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium transition-colors cursor-pointer">Register User</button>
+              </div>
+           </form>
         </div>
       )}
 
       <div className="glass rounded-2xl overflow-hidden shadow-sm">
         <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-white/40 dark:bg-slate-800/40">
-          <h2 className="text-lg font-bold text-slate-800 dark:text-white">Leave Requests</h2>
+          <h2 className="text-lg font-bold text-slate-800 dark:text-white">
+            {activeTab === 'leaves' ? 'Leave Workflow' : 'Company Staff'}
+          </h2>
         </div>
         
-        <div className="p-0 min-h-[200px]">
+        <div className="p-0 min-h-[400px]">
           {loading ? (
-             <div className="p-8 text-center text-slate-500">Loading requests...</div>
-          ) : leaves.length === 0 ? (
-            <div className="p-8 text-center text-slate-500">No leave requests found.</div>
-          ) : (
+             <div className="p-8 text-center text-slate-500">Loading {activeTab}...</div>
+          ) : activeTab === 'leaves' ? (
             <div className="divide-y divide-slate-200 dark:divide-slate-700">
-              {leaves.map((leave) => (
+              {leaves.length === 0 ? (
+                <div className="p-8 text-center text-slate-500">No leave requests found.</div>
+              ) : leaves.map((leave) => (
                 <div key={leave.id} className="p-6 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                   <div className="flex items-start mb-4 sm:mb-0">
                     <div className="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 flex items-center justify-center mr-4 mt-1 font-bold">
-                      {leave.employee_id} {/* Ideally we join user table for name */}
+                      {leave.employee_id}
                     </div>
                     <div>
                       <h4 className="text-lg font-semibold text-slate-800 dark:text-white">Emp ID: {leave.employee_id}</h4>
@@ -162,6 +187,40 @@ const HRM = () => {
                   )}
                 </div>
               ))}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/80 dark:bg-slate-800/80 text-slate-500 text-sm uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                    <th className="p-4 font-semibold">Employee</th>
+                    <th className="p-4 font-semibold">Department</th>
+                    <th className="p-4 font-semibold">Role</th>
+                    <th className="p-4 font-semibold">Joined Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                  {employees.map(emp => (
+                    <tr key={emp.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                      <td className="p-4 font-medium text-slate-900 dark:text-white">
+                        <div className="flex items-center">
+                           <UserCircle className="w-8 h-8 text-slate-400 mr-3" />
+                           <div>
+                             <div>{emp.full_name}</div>
+                             <div className="text-xs text-slate-500">{emp.email}</div>
+                           </div>
+                        </div>
+                      </td>
+                      <td className="p-4 text-slate-600 dark:text-slate-300">{emp.department || '-'}</td>
+                      <td className="p-4 text-slate-600 dark:text-slate-300">{emp.designation || '-'}</td>
+                      <td className="p-4 text-sm text-slate-500">{new Date(emp.joining_date).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                  {employees.length === 0 && (
+                    <tr><td colSpan="4" className="p-8 text-center text-slate-500">No employees registered.</td></tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

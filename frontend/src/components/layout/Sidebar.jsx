@@ -1,15 +1,17 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, UserPlus, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, UserPlus, LogOut, UserCircle, Briefcase } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const Sidebar = ({ isMobileOpen, setMobileOpen }) => {
   const { user, logout, hasRole } = useAuth();
 
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard, roles: ['Admin', 'Sales_Manager', 'Sales_Executive', 'HR_Executive', 'Employee'] },
-    { name: 'Leads', path: '/leads', icon: Users, roles: ['Admin', 'Sales_Manager', 'Sales_Executive'] },
-    { name: 'HRM', path: '/hrm', icon: UserPlus, roles: ['Admin', 'HR_Executive'] },
+    { name: 'Dashboard', path: '/', icon: LayoutDashboard, roles: ['Admin', 'Sales Manager', 'Sales Executive', 'HR Executive', 'Employee'] },
+    { name: 'Leads', path: '/leads', icon: Users, roles: ['Admin', 'Sales Manager', 'Sales Executive'] },
+    { name: 'Customers', path: '/customers', icon: Briefcase, roles: ['Admin', 'Sales Manager', 'Sales Executive'] },
+    { name: 'HRM', path: '/hrm', icon: UserPlus, roles: ['Admin', 'HR Executive'] },
+    { name: 'My Portal', path: '/my-portal', icon: UserCircle, roles: ['Admin', 'Sales Manager', 'Sales Executive', 'HR Executive', 'Employee'] },
   ];
 
   return (
