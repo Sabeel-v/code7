@@ -12,7 +12,7 @@ const HRM = () => {
   
   // Admin Staff Creation State
   const [showStaffForm, setShowStaffForm] = useState(false);
-  const [staffFormData, setStaffFormData] = useState({ full_name: '', email: '', password: '', role: 'Employee' });
+  const [staffFormData, setStaffFormData] = useState({ full_name: '', email: '', password: '', role: 'Employee', department: 'Sales', designation: 'Executive' });
 
   const fetchData = async () => {
     setLoading(true);
@@ -50,7 +50,7 @@ const HRM = () => {
     try {
       await api.post('/auth/create-user', staffFormData);
       setShowStaffForm(false);
-      setStaffFormData({ full_name: '', email: '', password: '', role: 'Employee' });
+      setStaffFormData({ full_name: '', email: '', password: '', role: 'Employee', department: 'Sales', designation: 'Executive' });
       fetchData();
     } catch (err) {
       let errorMsg = "Failed to create staff";
@@ -117,12 +117,28 @@ const HRM = () => {
                 <input required type="password" value={staffFormData.password} onChange={e=>setStaffFormData({...staffFormData, password: e.target.value})} className="w-full bg-white/50 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 p-2.5 rounded-lg text-sm" placeholder="••••••••" />
               </div>
               <div>
-                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Role Allocation</label>
-                 <select value={staffFormData.role} onChange={e=>setStaffFormData({...staffFormData, role: e.target.value})} className="w-full bg-white/50 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 p-2.5 rounded-lg text-sm text-slate-800 dark:text-white">
-                   {['Admin', 'Sales Manager', 'Sales Executive', 'HR Executive', 'Employee'].map(r => (
-                     <option key={r} value={r}>{r}</option>
-                   ))}
-                 </select>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Role Allocation</label>
+                <select value={staffFormData.role} onChange={e=>setStaffFormData({...staffFormData, role: e.target.value})} className="w-full bg-white/50 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 p-2.5 rounded-lg text-sm text-slate-800 dark:text-white">
+                  {['Admin', 'Sales Manager', 'Sales Executive', 'HR Executive', 'Employee'].map(r => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Department</label>
+                <select value={staffFormData.department} onChange={e=>setStaffFormData({...staffFormData, department: e.target.value})} className="w-full bg-white/50 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 p-2.5 rounded-lg text-sm text-slate-800 dark:text-white">
+                  {['Sales', 'HR', 'IT', 'Operations', 'Finance'].map(d => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Designation</label>
+                <select value={staffFormData.designation} onChange={e=>setStaffFormData({...staffFormData, designation: e.target.value})} className="w-full bg-white/50 border border-slate-300 dark:border-slate-600 dark:bg-slate-800 p-2.5 rounded-lg text-sm text-slate-800 dark:text-white">
+                  {['Manager', 'Executive', 'Senior Developer', 'Analyst', 'Director'].map(d => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
               </div>
               <div className="lg:col-span-4 flex justify-end space-x-2 mt-2">
                  <button type="button" onClick={() => setShowStaffForm(false)} className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-300 transition-colors">Cancel</button>
@@ -156,7 +172,7 @@ const HRM = () => {
                       <h4 className="text-lg font-semibold text-slate-800 dark:text-white">Emp ID: {leave.employee_id}</h4>
                       <p className="text-slate-500 dark:text-slate-400 text-sm flex items-center mt-1">
                         <Calendar className="w-4 h-4 mr-1.5" />
-                        {leave.leave_type} &bull; {leave.start_date} to {leave.end_date}
+                        {leave.leave_type} &bull; {new Date(leave.start_date).toLocaleDateString('en-GB')} to {new Date(leave.end_date).toLocaleDateString('en-GB')}
                       </p>
                       {leave.reason && <p className="text-sm mt-1 text-slate-500 italic">"{leave.reason}"</p>}
                       <span className={`inline-block mt-2 text-xs px-2.5 py-1 rounded-md font-medium border
@@ -211,9 +227,9 @@ const HRM = () => {
                            </div>
                         </div>
                       </td>
-                      <td className="p-4 text-slate-600 dark:text-slate-300">{emp.department || '-'}</td>
-                      <td className="p-4 text-slate-600 dark:text-slate-300">{emp.designation || '-'}</td>
-                      <td className="p-4 text-sm text-slate-500">{new Date(emp.joining_date).toLocaleDateString()}</td>
+                      <td className="p-4 text-slate-600 dark:text-slate-300">{emp.department || 'Pending Assignment'}</td>
+                      <td className="p-4 text-slate-600 dark:text-slate-300">{emp.designation || 'Pending Assignment'}</td>
+                      <td className="p-4 text-sm text-slate-500">{new Date(emp.joining_date).toLocaleDateString('en-GB')}</td>
                     </tr>
                   ))}
                   {employees.length === 0 && (

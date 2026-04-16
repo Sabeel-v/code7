@@ -10,6 +10,8 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    department: Optional[str] = None
+    designation: Optional[str] = None
 
 class UserResponse(UserBase):
     id: int

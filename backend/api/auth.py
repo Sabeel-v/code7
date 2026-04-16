@@ -36,6 +36,14 @@ def create_staff(user_in: UserCreate, db: Session = Depends(get_db), current_use
     db.commit()
     db.refresh(new_user)
 
+    new_employee = Employee(
+        user_id=new_user.id,
+        department=user_in.department,
+        designation=user_in.designation or role_enum.value
+    )
+    db.add(new_employee)
+    db.commit()
+
     return new_user
 
 @router.post("/register", response_model=UserResponse)
@@ -65,6 +73,14 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
+    new_employee = Employee(
+        user_id=new_user.id,
+        department=user_in.department,
+        designation=user_in.designation or role_enum.value
+    )
+    db.add(new_employee)
+    db.commit()
 
     return new_user
 

@@ -195,14 +195,20 @@ const Dashboard = () => {
     <div className="space-y-6 animate-slide-up">
       <div className="flex justify-between items-end mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Admin / Sales Overview</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            {user?.role === 'Sales Executive' ? 'My Sales Performance' : 'Admin / Sales Overview'}
+          </h1>
           <p className="text-slate-500 dark:text-slate-400">Welcome back, {user?.full_name}. Here's what's happening today.</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard title="Total Leads" value={loading ? "..." : stats.total_leads} icon={Users} trend="+12%" />
-        <StatCard title="Pending Leaves" value={loading ? "..." : stats.pending_leaves} icon={CalendarClock} />
+        {user?.role === 'Sales Executive' ? (
+          <StatCard title="My Conversion Rate" value={loading ? "..." : stats.conversion_rate} icon={Activity} />
+        ) : (
+          <StatCard title="Pending Leaves" value={loading ? "..." : stats.pending_leaves} icon={CalendarClock} />
+        )}
         <StatCard title="Converted" value={loading ? "..." : stats.converted} icon={CheckCircle2} trend="+4%" />
       </div>
 
@@ -229,7 +235,7 @@ const Dashboard = () => {
                   </div>
                   <span className={`text-xs px-2.5 py-1 rounded-md font-medium border
                     ${activity.status === 'New' ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400' : ''}
-                    ${activity.status === 'In_Progress' ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400' : ''}
+                    ${activity.status === 'System' ? 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400' : ''}
                     ${activity.status === 'Converted' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400' : ''}
                   `}>
                     {activity.status.replace('_', ' ')}

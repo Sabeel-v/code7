@@ -24,11 +24,11 @@ const Topbar = ({ onMenuClick }) => {
         
         <div className="flex items-center pl-4 border-l border-slate-200 dark:border-slate-700">
           <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary-600 to-purple-500 text-white flex items-center justify-center font-semibold text-sm shadow-sm cursor-pointer hover:shadow-md transition-shadow">
-            {user?.name?.charAt(0) || 'U'}
+            {user?.full_name?.charAt(0) || 'U'}
           </div>
           <div className="ml-3 hidden md:block">
             <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">
-              {user?.name || 'Unknown User'}
+              {user?.full_name || 'Unknown User'}
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {user?.role?.replace('_', ' ')}

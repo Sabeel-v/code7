@@ -29,7 +29,7 @@ const Leads = () => {
       if (canAssign) {
         const uRes = await api.get('/auth/users');
         // Filter users that are sales executives
-        setUsers(uRes.data.filter(u => ['Sales Executive', 'Sales Manager', 'Admin'].includes(u.role)));
+        setUsers(uRes.data.filter(u => ['Sales Executive', 'Sales Manager'].includes(u.role)));
       }
     } catch (err) {
       console.error("Failed to fetch leads", err);
@@ -172,12 +172,12 @@ const Leads = () => {
                             onChange={(e) => handleAssign(lead.id, e.target.value)}
                             className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-md text-xs py-1 px-2 focus:ring-primary-500"
                           >
-                            <option value="">Unassigned</option>
+                            <option value="">Pending Assignment</option>
                             {users.map(u => <option key={u.id} value={u.id}>{u.full_name}</option>)}
                           </select>
                        ) : (
                           <span className="text-sm text-slate-500">
-                             {lead.assigned_to ? `Assigned to ID: ${lead.assigned_to}` : 'Unassigned'}
+                             {lead.assigned_to ? `Assigned to ID: ${lead.assigned_to}` : 'Pending Assignment'}
                           </span>
                        )}
                     </td>

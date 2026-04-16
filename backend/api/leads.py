@@ -91,9 +91,10 @@ def convert_lead(lead_id: int, db: Session = Depends(get_db), current_user: User
     db.flush() # flush to get customer ID
     
     # Create Activity History
+    from datetime import datetime
     activity = ActivityHistory(
         customer_id=new_customer.id,
-        description=f"Lead {db_lead.name} was converted to customer by {current_user.full_name}.",
+        description=f"System Note: Lead converted by {current_user.full_name} on {datetime.now().strftime('%d/%m/%Y')}.",
         created_by=current_user.id
     )
     db.add(activity)

@@ -86,7 +86,7 @@ const EmployeePortal = () => {
               </div>
               <div className="flex items-center justify-between p-3 bg-white/50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700">
                 <span className="text-slate-500 text-sm flex items-center"><Calendar className="w-4 h-4 mr-2"/> Joined</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">{new Date(profile?.joining_date).toLocaleDateString()}</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">{new Date(profile?.joining_date).toLocaleDateString('en-GB')}</span>
               </div>
             </div>
           </div>
@@ -172,7 +172,7 @@ const EmployeePortal = () => {
                           </div>
                         </td>
                         <td className="p-4 text-sm text-slate-600 dark:text-slate-300">
-                          {leave.start_date} <br/> <span className="text-xs text-slate-400">to</span> {leave.end_date}
+                          {new Date(leave.start_date).toLocaleDateString('en-GB')} <br/> <span className="text-xs text-slate-400">to</span> {new Date(leave.end_date).toLocaleDateString('en-GB')}
                         </td>
                         <td className="p-4 text-sm text-slate-500 dark:text-slate-400 truncate max-w-xs">{leave.reason}</td>
                         <td className="p-4 text-right">

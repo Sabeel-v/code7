@@ -14,7 +14,7 @@ router = APIRouter(prefix="/hrm", tags=["HRM"])
 def get_my_profile(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     employee = db.query(Employee).filter(Employee.user_id == current_user.id).first()
     if not employee:
-        employee = Employee(user_id=current_user.id, department="Unassigned", designation="Employee")
+        employee = Employee(user_id=current_user.id, department=None, designation=current_user.role.value)
         db.add(employee)
         db.commit()
         db.refresh(employee)
@@ -49,7 +49,7 @@ def get_employees(db: Session = Depends(get_db), current_user: User = Depends(re
 def create_leave_request(leave_in: LeaveRequestCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     employee = db.query(Employee).filter(Employee.user_id == current_user.id).first()
     if not employee:
-        employee = Employee(user_id=current_user.id, department="Unassigned", designation="Employee")
+        employee = Employee(user_id=current_user.id, department=None, designation=current_user.role.value)
         db.add(employee)
         db.commit()
         db.refresh(employee)
